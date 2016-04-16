@@ -6,7 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using log4net;
 using System.IO;
-using Shadow.Utility;
+using System.Text;
 
 namespace PdfService.Controllers
 {
@@ -14,10 +14,30 @@ namespace PdfService.Controllers
     {
         protected static readonly ILog log = LogManager.GetLogger(typeof(ValuesController));
 
+        private static readonly Random random = new Random();
+
+        public static string RandomString(int size, bool lowerCase)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            char ch;
+            for (int i = 0; i < size; i++)
+            {
+                ch = Convert.ToChar(Convert.ToInt32(25 * random.NextDouble() + 65));
+                builder.Append(ch);
+            }
+
+            if (lowerCase)
+            {
+                return builder.ToString().ToLower();
+            }
+            return builder.ToString();
+        }
+
         // GET api/values/5
         public string Get(string templateUrl, string headerUrl, string footerUrl, int marginLeft, int marginRight, int marginBottom)
         {
-            var outputFilename = StringTools.RandomString(7, false) + ".pdf";
+            var outputFilename = RandomString(7, false) + ".pdf";
             string outputPath = Path.Combine(System.Web.HttpContext.Current.Server.MapPath(@"~/output"), outputFilename);
             var result = HtmlToPdf(templateUrl, outputPath, headerUrl, footerUrl, marginLeft, marginRight, marginBottom);
 
