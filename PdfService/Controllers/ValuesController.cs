@@ -35,11 +35,11 @@ namespace PdfService.Controllers
         }
 
         // GET api/values/5
-        public string Get(string templateUrl, string headerUrl, string footerUrl, int marginLeft, int marginRight, int marginBottom)
+        public string Get(string templateUrl, string headerUrl, string footerUrl, int marginLeft, int marginRight, int marginBottom, int headerSpacing)
         {
             var outputFilename = RandomString(7, false) + ".pdf";
             string outputPath = Path.Combine(System.Web.HttpContext.Current.Server.MapPath(@"~/output"), outputFilename);
-            var result = HtmlToPdf(templateUrl, outputPath, headerUrl, footerUrl, marginLeft, marginRight, marginBottom);
+            var result = HtmlToPdf(templateUrl, outputPath, headerUrl, footerUrl, marginLeft, marginRight, marginBottom, headerSpacing);
 
             if (result!=0)
                 return "wkhtml2pdf returned error: " + result.ToString();
@@ -61,7 +61,7 @@ namespace PdfService.Controllers
         /// <param name="Url"></param>
         /// <param name="outputFilename"></param>
         /// <returns></returns>
-        private static int HtmlToPdf(string Url, string outputFilename, string headerUrl, string footerUrl, int marginLeft, int marginRight, int marginBottom)
+        private static int HtmlToPdf(string Url, string outputFilename, string headerUrl, string footerUrl, int marginLeft, int marginRight, int marginBottom, int headerSpacing)
         {
             // assemble destination PDF file name
 
@@ -80,7 +80,7 @@ namespace PdfService.Controllers
             p.StartInfo.RedirectStandardError = true;
             p.StartInfo.RedirectStandardInput = true; // redirect all 3, as it should be all 3 or none
             //-B 0 -L 0 -R 0 -T 0
-            string switches = " -s A4  --margin-right " + marginRight + "mm --margin-left " + marginLeft + "mm --margin-bottom " + marginBottom + "mm";
+            string switches = " -s A4  --margin-right " + marginRight + "mm --margin-left " + marginLeft + "mm --margin-bottom " + marginBottom + "mm --header-spacing " + headerSpacing + "mm";
 
             switches += !string.IsNullOrWhiteSpace(headerUrl) ? " --header-html " + headerUrl + "" : " ";
             switches += !string.IsNullOrWhiteSpace(footerUrl) ? " --footer-html " + footerUrl + "" : " ";
