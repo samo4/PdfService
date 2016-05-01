@@ -80,7 +80,9 @@ namespace PdfService.Controllers
             p.StartInfo.RedirectStandardError = true;
             p.StartInfo.RedirectStandardInput = true; // redirect all 3, as it should be all 3 or none
             //-B 0 -L 0 -R 0 -T 0
-            string switches = " -s A4  --margin-right " + marginRight + "mm --margin-left " + marginLeft + "mm --margin-bottom " + marginBottom + "mm --header-spacing " + headerSpacing + "mm";
+            string switches = " -s A4  --margin-right " + marginRight + "mm --margin-left " + marginLeft + "mm --margin-bottom " + marginBottom + "mm ";
+            
+            // --header-spacing " + headerSpacing + "mm";
 
             switches += !string.IsNullOrWhiteSpace(headerUrl) ? " --header-html " + headerUrl + "" : " ";
             switches += !string.IsNullOrWhiteSpace(footerUrl) ? " --footer-html " + footerUrl + "" : " ";
