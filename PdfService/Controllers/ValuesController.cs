@@ -55,6 +55,36 @@ namespace PdfService.Controllers
             return true;
         }
 
+        private static int AddPasswordToPdf(string fileName, string password, string outputFilename)
+        {
+            var p = new System.Diagnostics.Process();
+            p.StartInfo.FileName = @"C:\Program Files (x86)\qpdf-8.0.2\bin\qpdf.exe";
+            p.StartInfo.WorkingDirectory = @"C:\Program Files (x86)\qpdf-8.0.2\bin";
+            p.StartInfo.UseShellExecute = false; // needs to be false in order to redirect output
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.RedirectStandardError = true;
+            p.StartInfo.RedirectStandardInput = true;
+
+            string switches = string.Format(" --encrypt {0} {0} 40 -- ", password, password);
+
+            var completeArguments = switches + " " + fileName + " " + outputFilename;
+            p.StartInfo.Arguments = completeArguments;
+            log.Info("AddPasswordToPdf: " + completeArguments);
+
+            p.StartInfo.UseShellExecute = false; // needs to be false in order to redirect output
+            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.RedirectStandardError = true;
+            p.StartInfo.RedirectStandardInput = true; // redirect all 3, as it should be all 3 or none
+            p.Start();
+
+            string output = p.StandardOutput.ReadToEnd();
+            p.WaitForExit(60000);
+            int returnCode = p.ExitCode;
+            p.Close();
+
+            return returnCode;
+        }
+
         /// <summary>
         /// Convert Html page at a given URL to a PDF file using open-source tool wkhtml2pdf
         /// </summary>
