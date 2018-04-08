@@ -34,16 +34,55 @@ namespace PdfService.Controllers
             return builder.ToString();
         }
 
-        // GET api/values/5
         public string Get(string templateUrl, string headerUrl, string footerUrl, int marginLeft, int marginRight, int marginBottom, int headerSpacing)
         {
-            var outputFilename = RandomString(7, false) + ".pdf";
+            
+            return ProcessTemplate(templateUrl, headerUrl, footerUrl, marginLeft, marginRight, marginBottom, headerSpacing, "");    
+        }
+
+        public string Get(string templateUrl)
+        {
+            var result = ProcessTemplate(templateUrl, "", "", 15, 15, 15, 10, "");
+            return result;
+        }
+
+        public string Get(string templateUrl, string password)
+        {
+            var result = ProcessTemplate(templateUrl, "", "", 20, 20, 20, 20, password);
+            return result;
+         }
+
+            // GET api/values/5
+        public string Get(string templateUrl, string headerUrl, string footerUrl, int marginLeft, int marginRight, int marginBottom, int headerSpacing, string password)
+        {
+            return ProcessTemplate(templateUrl, headerUrl, footerUrl, marginLeft, marginRight, marginBottom, headerSpacing, password);
+        }
+
+        public string ProcessTemplate(string templateUrl, string headerUrl, string footerUrl, int marginLeft, int marginRight, int marginBottom, int headerSpacing, string password)
+        {
+            var outputFilenameRoot = RandomString(7, false);
+            var outputFilename = outputFilenameRoot + ".pdf";
             string outputPath = Path.Combine(System.Web.HttpContext.Current.Server.MapPath(@"~/output"), outputFilename);
             var result = HtmlToPdf(templateUrl, outputPath, headerUrl, footerUrl, marginLeft, marginRight, marginBottom, headerSpacing);
 
-            if (result!=0)
+            if (result != 0)
                 return "wkhtml2pdf returned error: " + result.ToString();
-            return "/output/" + outputFilename;
+
+            if (string.IsNullOrEmpty(password))
+            {
+                return "/output/" + outputFilename;
+            }
+
+            var finalOutputFilename = outputFilenameRoot + "p.pdf";
+            var finalOutputPath = Path.Combine(System.Web.HttpContext.Current.Server.MapPath(@"~/output"), finalOutputFilename);
+            result = AddPasswordToPdf(outputPath, password, finalOutputPath);
+
+            File.Delete(outputPath);
+
+            if (result != 0)
+                return "qpdf returned error: " + result.ToString();
+
+            return "/output/" + finalOutputFilename;
         }
 
         public bool Delete(string fileName)
