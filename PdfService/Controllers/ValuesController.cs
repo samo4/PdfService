@@ -58,12 +58,17 @@ namespace PdfService.Controllers
             return ProcessTemplate(templateUrl, headerUrl, footerUrl, marginLeft, marginRight, marginBottom, headerSpacing, password);
         }
 
-        public string ProcessTemplate(string templateUrl, string headerUrl, string footerUrl, int marginLeft, int marginRight, int marginBottom, int headerSpacing, string password)
+        public string Get(string templateUrl, string headerUrl, string footerUrl, int marginLeft, int marginRight, int marginTop, int marginBottom, int headerSpacing,  string password)
+        {
+            return ProcessTemplate(templateUrl, headerUrl, footerUrl, marginLeft, marginRight, marginBottom, headerSpacing, password, marginTop);
+        }
+
+        public string ProcessTemplate(string templateUrl, string headerUrl, string footerUrl, int marginLeft, int marginRight, int marginBottom, int headerSpacing, string password, int marginTop = 15)
         {
             var outputFilenameRoot = RandomString(7, false);
             var outputFilename = outputFilenameRoot + ".pdf";
             string outputPath = Path.Combine(System.Web.HttpContext.Current.Server.MapPath(@"~/output"), outputFilename);
-            var result = HtmlToPdf(templateUrl, outputPath, headerUrl, footerUrl, marginLeft, marginRight, marginBottom, headerSpacing);
+            var result = HtmlToPdf(templateUrl, outputPath, headerUrl, footerUrl, marginLeft, marginRight, marginBottom, headerSpacing, marginTop);
 
             if (result != 0)
                 return "wkhtml2pdf returned error: " + result.ToString();
@@ -130,7 +135,7 @@ namespace PdfService.Controllers
         /// <param name="Url"></param>
         /// <param name="outputFilename"></param>
         /// <returns></returns>
-        private static int HtmlToPdf(string Url, string outputFilename, string headerUrl, string footerUrl, int marginLeft, int marginRight, int marginBottom, int headerSpacing)
+        private static int HtmlToPdf(string Url, string outputFilename, string headerUrl, string footerUrl, int marginLeft, int marginRight, int marginBottom, int headerSpacing, int marginTop)
         {
             // assemble destination PDF file name
 
@@ -155,6 +160,11 @@ namespace PdfService.Controllers
 
             switches += !string.IsNullOrWhiteSpace(headerUrl) ? " --header-html " + headerUrl + "" : " ";
             switches += !string.IsNullOrWhiteSpace(footerUrl) ? " --footer-html " + footerUrl + "" : " ";
+
+            if (marginTop > 0)
+            {
+                switches += string.Format(" --margin-top {0}mm ", marginTop);
+            }
 
             //string switches = "--print-media-type ";
             //switches += "--margin-top 4mm --margin-bottom 4mm --margin-right 0mm --margin-left 0mm ";
